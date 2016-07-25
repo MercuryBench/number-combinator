@@ -26,13 +26,7 @@ arb :: [a] -> [Termtree a]
 arb [] = []
 arb (x:[]) = [Lit x]
 arb (x:y:[]) = [Add (Lit x) (Lit y), Sub (Lit x) (Lit y), Mult (Lit x) (Lit y), Div (Lit x) (Lit y)]
-arb xs = do
-	let (t1, t2) = groups xs
-	s1 <- arb t1
-	s2 <- arb t2
-	op <- [Add, Sub, Mult, Div]
-	return $ op s1 s2
-	
+arb xs = join $ [liftM2 Add (arb t1) (arb t2) | (t1, t2) <- groups xs] ++ [liftM2 Sub (arb t1) (arb t2) | (t1, t2) <- groups xs] ++ [liftM2 Mult (arb t1) (arb t2) | (t1, t2) <- groups xs] ++ [liftM2 Div (arb t1) (arb t2) | (t1, t2) <- groups xs]
 
 allTermTrees :: [a] -> [Termtree a]
 allTermTrees = join . map arb . permutations 
