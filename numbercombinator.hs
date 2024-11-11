@@ -12,6 +12,7 @@ instance (Show a) => Show (Termtree a) where
 
 t = Add (Lit 3.0) (Div (Sub (Lit 1.0) (Lit 4.0)) (Lit 6.0))
 
+
 eval :: (Fractional a, Num a) => Termtree a -> a
 eval (Lit a)= a
 eval (Add t1 t2) = eval t1 + eval t2
@@ -27,12 +28,11 @@ arb [] = []
 arb (x:[]) = [Lit x]
 arb (x:y:[]) = [Add (Lit x) (Lit y), Sub (Lit x) (Lit y), Mult (Lit x) (Lit y), Div (Lit x) (Lit y)]
 arb xs = do
-	let (t1, t2) = groups xs
+	(t1, t2) <- groups xs
 	s1 <- arb t1
 	s2 <- arb t2
 	op <- [Add, Sub, Mult, Div]
 	return $ op s1 s2
-	
 
 allTermTrees :: [a] -> [Termtree a]
 allTermTrees = join . map arb . permutations 
